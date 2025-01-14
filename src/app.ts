@@ -1,9 +1,16 @@
-import express, { Application } from "express"
+import "reflect-metadata"
+import { InversifyExpressServer } from "inversify-express-utils"
+import express from "express"
+import container from "@/config/inversify.config"
+import dotenv from "dotenv"
+dotenv.config();
 
-export const app: Application = express();
+const server = new InversifyExpressServer(container)
 
-app.use(express.json())
+server.setConfig((app) => {
+    app.use(express.json())
+})
 
+const app = server.build();
 
-
-
+export default app;
