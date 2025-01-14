@@ -1,5 +1,11 @@
-import { app } from "@/app";
+import app from "@/app"
+import { connectDB } from "./config";
 
-const PORT = process.env.PORT || 3000
+const PORT = process.env.PORT as string;
 
-app.listen(PORT, () => console.log(`Server is running on port ${PORT}`)) 
+const bootstrap = async () => {
+    await connectDB();
+    app.listen(PORT, () => console.log(`🚀 Server started on ${PORT}`))
+}
+
+bootstrap(); 
