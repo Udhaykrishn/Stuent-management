@@ -1,5 +1,5 @@
 import { IStudent } from "@/interface/student.interface";
-import { IsNumber, MinLength, IsEmpty, IsString } from "class-validator"
+import { IsNumber, MinLength, IsString, IsNotEmpty } from "class-validator"
 
 
 export class createStudent implements IStudent {
@@ -8,10 +8,6 @@ export class createStudent implements IStudent {
     name!: string;
 
     @IsNumber()
-    @IsEmpty()
+    @IsNotEmpty()
     age!: number;
-
-    @IsNumber()
-    @IsEmpty()
-    _id!: string;
 }
