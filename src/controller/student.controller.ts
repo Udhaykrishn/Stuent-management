@@ -1,45 +1,56 @@
 import { Request, Response } from "express";
-import { inject, injectable } from "inversify";
+import { inject } from "inversify";
 import { IStudentService } from "@/services/interface/IStudentService";
 import { TYPES } from "@/types/student.types"
+import { controller, httpGet, httpPost, httpPut, httpDelete, request, response } from "inversify-express-utils"
+import { validateMiddleware } from "@/middleware";
+import { createStudent } from "@/dtos";
 
-@injectable()
-export abstract class StudentController {
+@controller('/students')
+export class StudentController {
     constructor(@inject(TYPES.StudentService) private readonly studentService: IStudentService) {
     }
 
-    async createStudent(req: Request, res: Response) {
-        try {
-            const student = await this.studentService.createStudent(req.body)
-            return res.status(201).json(student)
-        } catch (error) {
-            return res.status(500).json({ error: "Failed to create student" })
-        }
+    @httpPost("/", validateMiddleware(createStudent))
+    async createStudent(@request() req: Request, @response() res: Response) {
+        const student = await this.studentService.createStudent(req.body)
+        return res.status(201).json(student)
     }
 
-    async getAllStudents(req: Request, res: Response) {
-        try {
-            const students = await this.studentService.getAllStudents();
-            return res.status(200).json(students)
-        } catch (error) {
-            return res.status(500).json({ error: "Students not found" })
-        }
+    @httpGet("/")
+    async getAllStudents(@request() req: Request, @response() res: Response) {
+        const students = await this.studentService.getAllStudents();
+        return res.json(students)
     }
 
-    async getStudentById(req: Request, res: Response) {
-        try {
-            const student = await this.studentService.getStudentById(req.params.id)
-            return res.status(200).json(student)
-        } catch (error) {
-            return res.status(500).json({ error: "Student not found" })
+    @httpGet("/id")
+    async getStudentById(@request() req: Request, @response() res: Response) {
+        const student = await this.studentService.getStudentById(req.params.id)
+        if (student) {
+            return res.json(student)
         }
+        return res.status(404).json({ message: "user not found" })
     }
 
-    async updateStudent(req:Request,res:Response){
-        try {
-            
-        } catch (error) {
-            
+    @httpPut("/:id")
+    async updateStudent(@request() req: Request, @response() res: Response) {
+
+        const student = await this.studentService.updateStudent(req.params.id, req.body)
+        if (student) {
+            return res.json(student)
         }
+
+        return res.status(404).json({ message: "User not found" })
+
     }
+
+    @httpDelete("/:id")
+    async deleteStudent(@request() req: Request, @response() res: Response) {
+        const student = await this.studentService.deleteStudent(req.params.id);
+        if (student) {
+            return res.status(204).send()
+        }
+        return res.status(404).json({ message: "User not found" })
+    }
+
 }
