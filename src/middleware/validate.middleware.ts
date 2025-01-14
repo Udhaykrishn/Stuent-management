@@ -7,8 +7,9 @@ export const validateMiddleware = (dto: any) => async (req: Request, res: Respon
     const error = await validate(instance)
 
     if (error.length > 0) {
-        return res.status(400).json(error.map(err => err.constraints))
+        const validationErrors = error.map(err => err.constraints);
+        res.status(400).json({ errors: validationErrors });
+        return;
     }
-
     next();
 }
