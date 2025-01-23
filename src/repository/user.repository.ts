@@ -19,6 +19,11 @@ export class StudentRepository implements IStudentRepository {
   async findById(id: string): Promise<IStudent | null> {
     return await Student.findById(id)
   }
+
+  async findByEmail(email: string): Promise<IStudent | null> {
+    return await Student.findOne({ email })
+  }
+
   async update(id: string, data: Partial<IStudent>): Promise<IStudent | null> {
     return await Student.findByIdAndUpdate(id, data, { new: true })
   }

@@ -5,14 +5,23 @@ import { TYPES } from "@/types/student.types"
 import { controller, httpGet, httpPost, httpPut, httpDelete, request, response } from "inversify-express-utils"
 import { validateMiddleware } from "@/middleware";
 import { createStudent } from "@/dtos";
+import { IStudentRepository } from "@/repository";
 
 @controller('/students')
 export class StudentController {
-    constructor(@inject(TYPES.StudentService) private readonly studentService: IStudentService) {
+    constructor(
+        @inject(TYPES.StudentService) private readonly studentService: IStudentService,
+        @inject(TYPES.StudentRepository) private readonly studentRepo: IStudentRepository
+    ) {
     }
 
     @httpPost("/", validateMiddleware(createStudent))
     async createStudent(@request() req: Request, @response() res: Response) {
+        const user = await this.studentRepo.findByEmail(req.body.email)
+        if (user) {
+            return res.status(409).json({ message: "Email is already exists" })
+        } 
+
         const student = await this.studentService.createStudent(req.body)
         return res.status(201).json(student)
     }
@@ -20,10 +29,11 @@ export class StudentController {
     @httpGet("/")
     async getAllStudents(@request() req: Request, @response() res: Response) {
         const students = await this.studentService.getAllStudents();
+        console.log(students)
         return res.json(students)
     }
 
-    @httpGet("/id")
+    @httpGet("/:id")
     async getStudentById(@request() req: Request, @response() res: Response) {
         const student = await this.studentService.getStudentById(req.params.id)
         if (student) {

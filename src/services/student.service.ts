@@ -10,6 +10,7 @@ export class StudentSerivce implements IStudentService {
 
     }
     async createStudent(student: IStudent): Promise<IStudent> {
+     
         return await this.studentRepo.create(student)
     }
 

@@ -6,5 +6,6 @@ export interface IStudentRepository {
     findById(id: string): Promise<IStudent | null>
     update(id: string, data: Partial<IStudent>): Promise<IStudent | null>
     delete(id: string): Promise<boolean | null>
+    findByEmail(email: string): Promise<IStudent | null>
 }
 
